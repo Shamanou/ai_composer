@@ -6,7 +6,7 @@ import numpy
 from tensorflow.keras.layers import Reshape, Dense, Dropout, LSTM, Activation
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.utils import to_categorical
-from .util import Util
+from util import Util
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD
 import pickle

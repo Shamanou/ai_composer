@@ -4,7 +4,7 @@ import pickle
 
 import numpy
 from tensorflow import keras
-from .util import Util
+from util import Util
 from music21 import note, chord, stream, instrument, volume
 import tensorflow as tf
 
