@@ -1,32 +1,30 @@
-from music21 import converter, instrument, note, chord
+from scipy.io import wavfile
 from os import listdir
 from os.path import isfile, join
 
+categories_count = 100
+categories = list(range(categories_count))
+
 
 def get_notes():
-    """ Get all the notes and chords from the midi files in the ./midi_songs directory """
+    """ Get all the notes and chords from the wav_file files in the ./midi_songs directory """
     notes = []
-    for file in listdir("src/midi_songs/"):
-        if isfile(join("src/midi_songs/", file)):
-            midi = converter.parse("src/midi_songs/" + file)
+    for file in listdir("src/songs/"):
+        if isfile(join("src/songs/", file)):
+            _, wav_file = wavfile.read("src/songs/" + file)
 
             print("Parsing %s" % file)
 
-            notes_to_parse = []
-
-            partitioned_by_instruments = instrument.partitionByInstrument(midi)
-            for instrument_element_in_mid in partitioned_by_instruments.parts:
-                tmp = []
-                for instrument_in_mid in instrument_element_in_mid:
-                    tmp.append(instrument_in_mid)
-                notes_to_parse.append(tmp)
-
-            for parsed_instrument in notes_to_parse:
-                tmp = []
-                for element in parsed_instrument:
-                    if isinstance(element, note.Note):
-                        tmp.append(str(element.pitch))
-                    elif isinstance(element, chord.Chord):
-                        tmp.append('.'.join(str(n) for n in element.normalOrder))
-                notes.append(tmp)
+            partitioned_by_instruments = partition_by_category(wav_file[0])
+            notes.append(partitioned_by_instruments)
     return notes
+
+
+def partition_by_category(wav_file):
+    categorized_wav_file = []
+    for entry in wav_file:
+        for category in categories:
+            if entry <= category:
+                categorized_wav_file.append(category)
+                break
+    return categorized_wav_file

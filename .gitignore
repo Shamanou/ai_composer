@@ -75,5 +75,5 @@ env.bak/
 venv.bak/
 
 .vscode
-/src/midi_songs/
+/src/songs/
 /src/data/

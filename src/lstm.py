@@ -18,15 +18,12 @@ tf.config.experimental.set_memory_growth(physical_devices[1], enable=True)
 
 def train_network():
     """ Train a Neural Network to generate music """
-    notes = Util.get_notes()
+    notes = Util.categories
     with open('src/data/notes', 'wb') as file_handle:
         pickle.dump(notes, file_handle)
 
     # get amount of pitch names
-    n_vocab = [len(set(instrument)) for instrument in notes]
-
-    with open('src/data/instruments','wb') as file_handle:
-        pickle.dump(n_vocab, file_handle)
+    n_vocab = Util.categories_count
 
     network_input, network_output = prepare_sequences(notes, n_vocab)
     model = create_network(network_input.shape, network_output.shape)
@@ -37,26 +34,18 @@ def prepare_sequences(notes, n_vocab):
     """ Prepare the sequences used by the Neural Network """
     sequence_length = 100
 
-    # get all pitch names
-    pitch_names = []
-    for instrument_in_mid in notes:
-        pitch_names.append(sorted(set(item for item in instrument_in_mid)))
-
     # create a dictionary to map pitches to integers
-    note_to_int = []
-    for instrument_in_mid in pitch_names:
-        note_to_int.append(dict((note, number) for number, note in enumerate(instrument_in_mid)))
+    note_to_int = Util.get_notes()
 
-    network_input = [[]] * len(notes)
-    network_output = [[]] * len(notes)
+    network_input = get_empty_notes_list(notes)
+    network_output = get_empty_notes_list(notes)
 
     # create input sequences and the corresponding outputs
     for instrument_index, instrument_in_mid in enumerate(notes):
         for i in range(0, len(instrument_in_mid) - sequence_length, 1):
             sequence_in = instrument_in_mid[i:i + sequence_length]
             sequence_out = instrument_in_mid[i + sequence_length]
-            network_input[instrument_index].append([note_to_int[instrument_index][char]
-                                                    for char in sequence_in])
+            network_input[instrument_index].append([note_to_int[instrument_index][char] for char in sequence_in])
             network_output[instrument_index].append(note_to_int[instrument_index][sequence_out])
 
     network_input = numpy.array(network_input, dtype=numpy.float32)
@@ -71,6 +60,10 @@ def prepare_sequences(notes, n_vocab):
     network_output = to_categorical(network_output)
     network_output = network_output.reshape((network_output.shape[0], network_output.shape[2], network_output.shape[1]))
     return network_input, network_output
+
+
+def get_empty_notes_list(notes):
+    return [[]] * len(notes)
 
 
 def create_network(input_shape, output_shape):
