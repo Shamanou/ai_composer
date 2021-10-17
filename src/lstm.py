@@ -19,7 +19,7 @@ tf.config.experimental.set_memory_growth(physical_devices[1], enable=True)
 def train_network():
     """ Train a Neural Network to generate music """
     notes = Util.categories
-    with open('src/data/notes', 'wb') as file_handle:
+    with open('data/notes', 'wb') as file_handle:
         pickle.dump(notes, file_handle)
 
     # get amount of pitch names
@@ -41,12 +41,14 @@ def prepare_sequences(notes, n_vocab):
     network_output = get_empty_notes_list(notes)
 
     # create input sequences and the corresponding outputs
-    for instrument_index, instrument_in_mid in enumerate(notes):
-        for i in range(0, len(instrument_in_mid) - sequence_length, 1):
-            sequence_in = instrument_in_mid[i:i + sequence_length]
-            sequence_out = instrument_in_mid[i + sequence_length]
-            network_input[instrument_index].append([note_to_int[instrument_index][char] for char in sequence_in])
-            network_output[instrument_index].append(note_to_int[instrument_index][sequence_out])
+    for index, song in enumerate(notes):
+        for i in range(0, len(song) - sequence_length, 1):
+            sequence_in = song[i:i + sequence_length]
+            sequence_in = map(lambda x: x[1], sequence_in)
+            sequence_out = song[i + sequence_length]
+            sequence_out = map(lambda x: x[0], sequence_out)
+            network_input[index].append(sequence_in)
+            network_output[index].append(sequence_out)
 
     network_input = numpy.array(network_input, dtype=numpy.float32)
     network_input = network_input.reshape((network_input.shape[1], -1, network_input.shape[0]))
