@@ -10,7 +10,7 @@ categories = numpy.linspace(0, 1500, categories_count)
 def get_notes():
     """ Get all the notes and chords from the wav_file files in the ./midi_songs directory """
     notes = []
-    song_available = listdir("songs/")
+    song_available = listdir("songs/")[:10]
     for index, file in enumerate(song_available):
         if isfile(join("songs/", file)):
             _, wav_file = wavfile.read("songs/" + file)
@@ -19,9 +19,9 @@ def get_notes():
 
             partitioned_by_instruments = partition_by_category(list(map(lambda x: x[0], wav_file)))
             notes.append(partitioned_by_instruments)
-    return notes, categories
+    return notes
 
 
 def partition_by_category(wav_file):
     digitized = numpy.digitize(wav_file, categories)
-    return zip(digitized.tolist(), wav_file)
+    return digitized.tolist(), wav_file

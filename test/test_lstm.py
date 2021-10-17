@@ -1,6 +1,6 @@
 import unittest
 
-from src.lstm import list_blobs_with_prefix, get_instruments
+from src.train import list_blobs_with_prefix, get_instruments
 
 
 class TestLstm(unittest.TestCase):
